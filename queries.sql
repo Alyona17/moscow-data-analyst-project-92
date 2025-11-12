@@ -21,13 +21,7 @@ limit 10 -- ограничиваем выборку
 
 
 -- шаг 5 таблица 2
-with overall_average_income as -- объявляем запрос, который подсчитывает среднюю выручку за сделку по всем продавцам
-(
-select
-floor(avg(s.quantity * p.price)) as overall_average
-from sales s
-inner join products p on s.product_id = p.product_id
-),
+with
 seller_average as -- объявляем запрос, подсчитывающий среднюю выручку за сделку по каждому продавцу
 (
 select
@@ -42,7 +36,9 @@ select -- просим показать имя-фамилию и среднюю 
 seller,
 average_income
 from seller_average
-where average_income < (select overall_average from overall_average_income)
+where average_income < (select floor(avg(s.quantity * p.price)) -- создаём подзапрос, считающий общую среднюю сумму сделки
+from sales s
+inner join products p on s.product_id = p.product_id)
 order by average_income asc;
 
 
